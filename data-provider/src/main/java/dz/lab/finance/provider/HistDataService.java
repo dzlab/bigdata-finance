@@ -25,6 +25,9 @@ import com.google.common.eventbus.EventBus;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 
+import dz.lab.finance.provider.data.FileDownloadedEvent;
+import dz.lab.finance.provider.data.HistDataForm;
+
 public class HistDataService implements LifeCycle {
 	private final RestAdapter restAdapter;
 	private final HistDataEndpoint endpoint;
@@ -46,7 +49,7 @@ public class HistDataService implements LifeCycle {
 					return;
 				// add a Referer header
 				HistDataForm form = queries.poll();
-				String datemonth = form.datemonth;
+				String datemonth = form.getDatemonth();
 				String year = datemonth.substring(0, 4);
 				String month = datemonth.substring(4, 6);
 				request.addHeader(
@@ -65,14 +68,17 @@ public class HistDataService implements LifeCycle {
 		bus.register(this);
 		OkHttpClient client = new OkHttpClient();		
 		HistDataCallback callback = new HistDataCallback(this);
-		int year = 2014;
-		for(int month=1; month<=1; month++) {
-			String url = new StringBuilder("http://www.histdata.com/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/eurusd/").append(year).append('/').append(month).toString();
-			Request request = new Request.Builder()
-		      .url(url)
-		      .build();
-			client.newCall(request).enqueue(callback);			
-		}
+		String[] forexes = {"EUR/USD", "EUR/CHF"}; // extract those from main page
+		int initialYear = 2000;
+		for(int year=initialYear; year<=2014; year++) {
+			for(int month=1; month<=12; month++) {
+				String url = new StringBuilder("http://www.histdata.com/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/eurusd/").append(year).append('/').append(month).toString();
+				Request request = new Request.Builder()
+			      .url(url)
+			      .build();
+				client.newCall(request).enqueue(callback);			
+			}
+		}		
 	}
 	
 	public void request(final String tk, final String date, final String datemonth, final String platform, final String timeframe, final String fxpair) {
@@ -84,7 +90,7 @@ public class HistDataService implements LifeCycle {
 				try {
 					InputStream body = response.getBody().in();
 					String tempDir = System.getProperty("java.io.tmpdir");
-					String filename = new StringBuilder("HISTDATA_COM_NT_").append(fxpair).append(timeframe).append(datemonth).append(".zip").toString();
+					String filename = new StringBuilder("HISTDATA_COM_NT_").append(fxpair).append('_').append(timeframe).append(datemonth).append(".zip").toString();
 					File file = new File(tempDir, filename);					 
 				    FileUtils.copyInputStreamToFile(body, file);	
 				    bus.post(produceFileEvent(file.getAbsolutePath()));
@@ -101,8 +107,6 @@ public class HistDataService implements LifeCycle {
 			}
 		});
 	}
-	
-	
 
 	private static interface HistDataEndpoint {
 		@FormUrlEncoded

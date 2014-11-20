@@ -1,4 +1,4 @@
-package dz.lab.finance.provider;
+package dz.lab.finance.provider.data;
 
 public class HistDataForm {
 
@@ -16,5 +16,9 @@ public class HistDataForm {
 		this.platform = platform;
 		this.timeframe = timeframe;
 		this.fxpair = fxpair;
+	}
+	
+	public String getDatemonth() {
+		return datemonth;
 	}
 }

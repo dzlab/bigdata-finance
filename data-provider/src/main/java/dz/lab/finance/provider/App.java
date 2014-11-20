@@ -22,11 +22,7 @@ public class App {
 		HistDataService service = objectGraph.get(HistDataService.class);
 		HistDataFileProcessor processor = objectGraph
 				.get(HistDataFileProcessor.class);
-		processor.start();
-
-		/*EventBus bus = appModule.provideBus();
-		bus.post(new FileDownloadedEvent("blala"));*/
-		
+		processor.start();		
 		service.start();
 		System.out.println("Type enter to leave.");
 		System.in.read();

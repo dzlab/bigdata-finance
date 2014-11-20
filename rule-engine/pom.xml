@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dz.lab.finance</groupId>
+		<artifactId>bigdata-finance</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>dz.lab.finance</groupId>
+	<artifactId>rule-engine</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>rule-engine</name>
+	<description>
+    	Samza is a stream processing system. Think of it as Map-Reduce for streams.
+  	</description>
+	<url>http://maven.apache.org</url>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>samza</groupId>
+				<artifactId>samza-jobs</artifactId>
+				<version>0.7.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-api</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-core_2.10</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-serializers_2.10</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-shell</artifactId>
+				<classifier>dist</classifier>
+				<type>tgz</type>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-yarn_2.10</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-kv_2.10</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.samza</groupId>
+				<artifactId>samza-kafka_2.10</artifactId>
+				<version>${samza.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka_2.10</artifactId>
+				<version>0.8.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.schwering</groupId>
+				<artifactId>irclib</artifactId>
+				<version>1.10</version>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>2.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.6.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>1.6.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-jaxrs</artifactId>
+				<version>1.8.5</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<properties>
+		<!-- maven specific properties -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<samza.version>0.7.0</samza.version>
+	</properties>
+
+	<modules>
+		<module>samza-job-package</module>
+		<module>samza-jobs</module>
+	</modules>
+
+	<repositories>
+		<repository>
+			<id>my-local-repo</id>
+			<url>file://${user.home}/.m2/repository</url>
+		</repository>
+		<repository>
+			<id>apache-releases</id>
+			<url>https://repository.apache.org/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>https://oss.sonatype.org/content/groups/scala-tools</url>
+		</repository>
+		<!-- for zkclient -->
+		<repository>
+			<id>sonatype</id>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

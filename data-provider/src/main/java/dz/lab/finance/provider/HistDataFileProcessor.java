@@ -11,27 +11,65 @@ import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import kafka.producer.KeyedMessage;
+import kafka.javaapi.producer.Producer;
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.gson.Gson;
+
+import dz.lab.finance.provider.data.FileDownloadedEvent;
+import dz.lab.finance.provider.data.ForexEvent;
 
 public class HistDataFileProcessor implements LifeCycle {
+	private static Logger logger = LoggerFactory
+			.getLogger(HistDataFileProcessor.class);
+
+	private static final String STREAM = "forex_events";
+	
+	@Inject
+	Gson gson;
 
 	@Inject
 	EventBus bus;
+
 	@Inject
 	ExecutorService executor;
+
+	@Inject
+	Producer<String, String> producer;
 
 	public HistDataFileProcessor() {
 	}
 
+	private void handleCSVFileStream(String forex, InputStream stream) throws IOException {
+		CSVReader reader = new CSVReader(new InputStreamReader(stream), ';');
+		String[] nextLine;
+		try {
+
+			while ((nextLine = reader.readNext()) != null) {
+				String timestamp = nextLine[0];
+				BigDecimal conversion = new BigDecimal(nextLine[1]);
+				ForexEvent event = new ForexEvent(forex, timestamp, conversion);
+				KeyedMessage<String, String> data = new KeyedMessage<String, String>(
+						STREAM, timestamp, gson.toJson(event));
+				producer.send(data);
+			}
+		} finally {
+			reader.close();
+		}
+	}
+
+	/**
+	 * Process a zip file
+	 */
 	public void process(String filename) throws IOException {
+		String[] parts = filename.split("_");
+		String forex = parts[3];
 		ZipFile zipFile = null;
 		try {
 			zipFile = new ZipFile(filename);
@@ -43,23 +81,12 @@ public class HistDataFileProcessor implements LifeCycle {
 				if (!entry.getName().endsWith("csv")) {
 					continue;
 				}
-				System.out.println("entry: " + entry.getName());
-				CSVReader reader = null;
-				try {
-					InputStream stream = zipFile.getInputStream(entry);	
-					reader = new CSVReader(new InputStreamReader(stream), ';');
-					String [] nextLine;
-					while ((nextLine = reader.readNext()) != null) {
-						String timestamp = nextLine[0];
-						BigDecimal conversion = new BigDecimal(nextLine[1]);
-						System.out.println(timestamp + ", " + conversion);
-					}
-					System.out.println("Finished processing: " + entry.getName());
-				}finally {
-					reader.close();
-				}
-				
-			}		
+				InputStream stream = zipFile.getInputStream(entry);
+				handleCSVFileStream(forex, stream);
+				logger.info("Finished processing: " + entry.getName());
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		} finally {
 			zipFile.close();
 		}
@@ -67,7 +94,7 @@ public class HistDataFileProcessor implements LifeCycle {
 
 	@Subscribe
 	public void handleFileDownload(FileDownloadedEvent event) {
-		System.out.println("Handling " + event);
+		logger.info("Handling " + event);
 		final String filename = event.getFilename();
 		executor.submit(new Runnable() {
 			@Override
