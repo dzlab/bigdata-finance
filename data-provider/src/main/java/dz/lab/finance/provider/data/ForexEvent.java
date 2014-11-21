@@ -36,4 +36,12 @@ public class ForexEvent {
     		this.conversion = conversion;
     	}
     }
+
+	@Override
+	public String toString() {
+		return "ForexEvent [subject=" + subject.forex + ", context=" + context.timestamp
+				+ ", directObject=" + directObject.conversion + "]";
+	}
+    
+    
 }
