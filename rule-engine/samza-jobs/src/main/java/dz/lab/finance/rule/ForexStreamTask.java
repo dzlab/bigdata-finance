@@ -1,10 +1,12 @@
 package dz.lab.finance.rule;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.samza.config.Config;
 import org.apache.samza.storage.kv.KeyValueStore;
@@ -29,7 +31,7 @@ public class ForexStreamTask implements StreamTask, InitableTask, WindowableTask
 	
 	private KeyValueStore<String, Integer> store;
 	
-	private Set<Rule> rules = new HashSet<Rule>();
+	private Set<Rule> rules = Collections.newSetFromMap(new ConcurrentHashMap<Rule, Boolean>());
 	private Set<String> ruleKeys = new HashSet<String>();
 	
 	@SuppressWarnings("unchecked")
@@ -48,7 +50,7 @@ public class ForexStreamTask implements StreamTask, InitableTask, WindowableTask
 		Map<String, Object> subject = (Map<String, Object>) event.get("subject");
 		String forex = (String) subject.get("forex");
 		Map<String, Object> directObject = (Map<String, Object>) event.get("directObject");
-		BigDecimal conversion = new BigDecimal((String)directObject.get("conversion"));
+		BigDecimal conversion = new BigDecimal((Double)directObject.get("conversion"));
 		
 		// check if any rule applies
 		for(Rule rule: rules) {
