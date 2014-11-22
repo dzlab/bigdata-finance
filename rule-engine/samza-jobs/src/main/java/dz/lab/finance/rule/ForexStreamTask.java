@@ -38,7 +38,7 @@ public class ForexStreamTask implements StreamTask, InitableTask, WindowableTask
 	@Override
 	public void init(Config config, TaskContext context) {
 		this.store = (KeyValueStore<String, Integer>) context.getStore("forex-engine");
-		this.rules.add(new Rule("eurusd", System.currentTimeMillis() + 1000*10, new BigDecimal("1.24"), Comparaison.LE, Action.BUY));
+		this.rules.add(new Rule("eurusd", System.currentTimeMillis() + 1000*60*5, new BigDecimal("1.24"), Comparaison.LE, Action.BUY));
 		this.rules.add(new Rule("eurusd", -1, new BigDecimal("1.25"), Comparaison.GRE, Action.SELL));
 	}
 
@@ -50,7 +50,7 @@ public class ForexStreamTask implements StreamTask, InitableTask, WindowableTask
 		Map<String, Object> subject = (Map<String, Object>) event.get("subject");
 		String forex = (String) subject.get("forex");
 		Map<String, Object> directObject = (Map<String, Object>) event.get("directObject");
-		BigDecimal conversion = new BigDecimal((Double)directObject.get("conversion"));
+		BigDecimal conversion = new BigDecimal((String)directObject.get("conversion"));
 		
 		// check if any rule applies
 		for(Rule rule: rules) {
