@@ -11,7 +11,7 @@ import dagger.ObjectGraph;
  */
 public class App {
 	
-	@Module(includes = ApplicationModule.class, injects = {HistDataService.class,HistDataFileProcessor.class})
+	@Module(includes = ApplicationModule.class, injects = {ForexService.class,ForexFileProcessor.class})
 	static class AppModule {
 		
 	}
@@ -19,9 +19,9 @@ public class App {
 	public static void main(String[] args) throws IOException {
 		
 		ObjectGraph objectGraph = ObjectGraph.create(new AppModule());
-		HistDataService service = objectGraph.get(HistDataService.class);
-		HistDataFileProcessor processor = objectGraph
-				.get(HistDataFileProcessor.class);
+		ForexService service = objectGraph.get(ForexService.class);
+		ForexFileProcessor processor = objectGraph
+				.get(ForexFileProcessor.class);
 		processor.start();		
 		service.start();
 		System.out.println("Type enter to leave.");

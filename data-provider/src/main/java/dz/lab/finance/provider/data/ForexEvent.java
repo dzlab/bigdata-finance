@@ -7,7 +7,7 @@ public class ForexEvent {
 	public final Context context;
 	public final DirectObject directObject;
 	
-	public ForexEvent(String forex, String timestamp, BigDecimal conversion) {
+	public ForexEvent(String forex, String timestamp, String conversion) {
 		this.subject = new Subject(forex);
 		this.context = new Context(timestamp);
 		this.directObject = new DirectObject(conversion);
@@ -30,9 +30,9 @@ public class ForexEvent {
     }
     
     public static class DirectObject {
-    	public final BigDecimal conversion;
+    	public final String conversion;
     	
-    	public DirectObject(BigDecimal conversion) {
+    	public DirectObject(String conversion) {
     		this.conversion = conversion;
     	}
     }

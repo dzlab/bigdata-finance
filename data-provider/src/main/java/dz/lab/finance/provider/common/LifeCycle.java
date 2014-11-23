@@ -1,4 +1,4 @@
-package dz.lab.finance.provider;
+package dz.lab.finance.provider.common;
 
 public interface LifeCycle {
 	

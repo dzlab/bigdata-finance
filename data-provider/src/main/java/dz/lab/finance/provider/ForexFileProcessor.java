@@ -22,12 +22,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 
+import dz.lab.finance.provider.common.LifeCycle;
 import dz.lab.finance.provider.data.FileDownloadedEvent;
 import dz.lab.finance.provider.data.ForexEvent;
 
-public class HistDataFileProcessor implements LifeCycle {
+public class ForexFileProcessor implements LifeCycle {
 	private static Logger logger = LoggerFactory
-			.getLogger(HistDataFileProcessor.class);
+			.getLogger(ForexFileProcessor.class);
 
 	private static final String STREAM = "forex_events";
 	
@@ -43,7 +44,7 @@ public class HistDataFileProcessor implements LifeCycle {
 	@Inject
 	Producer<String, String> producer;
 
-	public HistDataFileProcessor() {
+	public ForexFileProcessor() {
 	}
 
 	private void handleCSVFileStream(String forex, InputStream stream) throws IOException {
@@ -53,7 +54,7 @@ public class HistDataFileProcessor implements LifeCycle {
 
 			while ((nextLine = reader.readNext()) != null) {
 				String timestamp = nextLine[0];
-				BigDecimal conversion = new BigDecimal(nextLine[1]);
+				String conversion = nextLine[1];
 				ForexEvent event = new ForexEvent(forex, timestamp, conversion);
 				KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 						STREAM, timestamp, gson.toJson(event));

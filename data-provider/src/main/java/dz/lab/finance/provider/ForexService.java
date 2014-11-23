@@ -3,6 +3,7 @@ package dz.lab.finance.provider;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -25,17 +26,19 @@ import com.google.common.eventbus.EventBus;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 
+import dz.lab.finance.provider.common.LifeCycle;
 import dz.lab.finance.provider.data.FileDownloadedEvent;
+import dz.lab.finance.provider.data.ForexPair;
 import dz.lab.finance.provider.data.HistDataForm;
 
-public class HistDataService implements LifeCycle {
+public class ForexService implements LifeCycle {
 	private final RestAdapter restAdapter;
 	private final HistDataEndpoint endpoint;
 	private final Queue<HistDataForm> queries;
 	@Inject EventBus bus;
 	
 	
-	public HistDataService() {
+	public ForexService() {
 		// Define the interceptor, add authentication headers
 		RequestInterceptor requestInterceptor = new RequestInterceptor() {
 			@Override
@@ -65,23 +68,29 @@ public class HistDataService implements LifeCycle {
 	}
 	
 	public void start() {
-		bus.register(this);
-		OkHttpClient client = new OkHttpClient();		
-		HistDataCallback callback = new HistDataCallback(this);
-		String[] forexes = {"EUR/USD", "EUR/CHF"}; // extract those from main page
-		int initialYear = 2000;
-		for(int year=initialYear; year<=2014; year++) {
-			for(int month=1; month<=12; month++) {
-				String url = new StringBuilder("http://www.histdata.com/download-free-forex-historical-data/?/ninjatrader/tick-last-quotes/eurusd/").append(year).append('/').append(month).toString();
-				Request request = new Request.Builder()
-			      .url(url)
-			      .build();
-				client.newCall(request).enqueue(callback);			
-			}
-		}		
+		bus.register(this);		
+		// extract those from main page
+		ForexPairsRequest request = new ForexPairsRequest(this);
+		request.submit();	
 	}
 	
-	public void request(final String tk, final String date, final String datemonth, final String platform, final String timeframe, final String fxpair) {
+	public void handleForexPairs(List<ForexPair> pairs) {
+		ForexFileRequest request = new ForexFileRequest(this);
+		for(ForexPair pair: pairs) {
+			int initialYear = pair.year;
+			for(int year=initialYear; year<=2014; year++) {
+				int initialMonth = 1;
+				if(year == initialYear) {
+					initialMonth = pair.month;
+				}
+				for(int month=initialMonth; month<=12; month++) {
+					request.submit("eurusd", year, month);
+				}
+			}	
+		}
+	}
+	
+	public void handleForexForm(final String tk, final String date, final String datemonth, final String platform, final String timeframe, final String fxpair) {
 		queries.add(new HistDataForm(tk, date, datemonth, platform, timeframe, fxpair));
 		endpoint.getForex(tk, date, datemonth, platform, timeframe, fxpair, new Callback<Response>() {
 			

@@ -1,4 +1,4 @@
-package dz.lab.finance.provider;
+package dz.lab.finance.provider.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
