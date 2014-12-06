@@ -26,3 +26,5 @@ mkdir -p deploy/samza
 tar -xvf samza-job-package-1.0-SNAPSHOT-dist.tar.gz -C deploy/samza/
 ./deploy/samza/bin/run-job.sh --config-factory=org.apache.samza.config.factories.PropertiesConfigFactory --config-path=file://$PWD/deploy/samza/config/forex-engine.properties
 ```
+Stop a samza Application Master
+`yarn application -kill <application_id>`
