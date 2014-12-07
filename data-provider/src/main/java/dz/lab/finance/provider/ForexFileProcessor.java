@@ -22,9 +22,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 
+import dz.lab.finance.model.ForexEvent;
 import dz.lab.finance.provider.common.LifeCycle;
 import dz.lab.finance.provider.data.FileDownloadedEvent;
-import dz.lab.finance.provider.data.ForexEvent;
 
 public class ForexFileProcessor implements LifeCycle {
 	private static Logger logger = LoggerFactory

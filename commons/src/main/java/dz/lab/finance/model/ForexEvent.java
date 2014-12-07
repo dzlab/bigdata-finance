@@ -1,8 +1,7 @@
-package dz.lab.finance.provider.data;
-
-import java.math.BigDecimal;
+package dz.lab.finance.model;
 
 public class ForexEvent {
+	
 	public final Subject subject;
 	public final Context context;
 	public final DirectObject directObject;
@@ -42,6 +41,4 @@ public class ForexEvent {
 		return "ForexEvent [subject=" + subject.forex + ", context=" + context.timestamp
 				+ ", directObject=" + directObject.conversion + "]";
 	}
-    
-    
 }

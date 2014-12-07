@@ -14,6 +14,8 @@
     <okhttp.version>2.1.0</okhttp.version>
     <dagger.version>1.2.2</dagger.version>
     <spring.version>4.1.2.RELEASE</spring.version>
+    <lombok.version>1.14.8</lombok.version>
+    <guava.version>18.0</guava.version>
 	</properties>
 
   <dependencies>
@@ -28,5 +30,6 @@
     <module>data-provider</module>
     <module>rule-engine</module>
     <module>visualization</module>
+    <module>commons</module>
   </modules>
 </project>

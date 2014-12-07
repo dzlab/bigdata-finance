@@ -19,7 +19,7 @@ import dz.lab.finance.provider.data.ForexPair;
 public class ForexPairsPageParser {
 	private final Elements tds;
 	
-	public static final Map<String, Integer> MONTHS = new HashMap<>();
+	public static final Map<String, Integer> MONTHS = new HashMap<String, Integer>();
 	static {
 		MONTHS.put("January", 1);
 		MONTHS.put("February", 2);
@@ -48,7 +48,7 @@ public class ForexPairsPageParser {
 	 * @return the {@link List} of extracted {@link ForexPair}s.
 	 */
 	public List<ForexPair> getForexPairs() {
-		List<ForexPair> pairs = new LinkedList<>();
+		List<ForexPair> pairs = new LinkedList<ForexPair>();
 		for(Element el: tds) {
 			if(!el.child(0).tagName().equals("a")) {
 				continue;

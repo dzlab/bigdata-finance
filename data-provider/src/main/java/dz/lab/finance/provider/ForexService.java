@@ -64,7 +64,7 @@ public class ForexService implements LifeCycle {
 				.setEndpoint("http://www.histdata.com")
 				.setRequestInterceptor(requestInterceptor).build();
 		this.endpoint = restAdapter.create(HistDataEndpoint.class);
-		this.queries = new ConcurrentLinkedQueue<>();
+		this.queries = new ConcurrentLinkedQueue<HistDataForm>();
 	}
 	
 	public void start() {

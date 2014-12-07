@@ -3,7 +3,6 @@ package dz.lab.finance.viz.websocket;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -16,46 +15,35 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.socket.server.standard.SpringConfigurator;
 
-import dz.lab.finance.viz.StreamConsumer;
+import com.google.common.eventbus.EventBus;
 
-@ServerEndpoint("/websocket")
+import dz.lab.finance.model.SessionEvent;
+import dz.lab.finance.model.SessionEvent.TYPE;
+
+@ServerEndpoint(value = "/websocket", configurator = SpringConfigurator.class)
 public class WebsocketServer {
 	private static final Log log = LogFactory.getLog(WebsocketServer.class);
 
-	// @Autowired
-	private ThreadPoolTaskExecutor taskExecutor;
-
+	@Autowired
+	public EventBus bus;
+	
 	private final Map<String, Session> sessions;
-	private final StreamConsumer consumer;
 
-	public WebsocketServer() {
-		this.taskExecutor = new ThreadPoolTaskExecutor();
-		this.sessions = new HashMap<String, Session>();
-		this.consumer = new StreamConsumer();
-		initialize();
-	}
-
-	public void initialize() {
-		log.info("Creating ThreadPoolExecutor");
-		this.taskExecutor.setBeanName("taskExecutor");
-		this.taskExecutor.setCorePoolSize(4);
-		this.taskExecutor.setMaxPoolSize(8);
-		this.taskExecutor.setQueueCapacity(16);
-		this.taskExecutor.initialize();
-		taskExecutor.submit(consumer);
+	public WebsocketServer() {		
+		this.sessions = new HashMap<String, Session>();		
 	}
 
 	@OnOpen
 	public void onOpen(Session session) {
 		log.info("Connected ... " + session.getId());
 		sessions.put(session.getId(), session);
-		consumer.add(session);
+		bus.post(new SessionEvent(TYPE.OPEN, session));
 	}
 
 	@OnMessage
-	public String onMessage(String message, Session session) {
+	public void onMessage(String message, Session session) {
 		log.info("received: " + message);
 		if (message.equals("quit")) {
 			try {
@@ -65,7 +53,6 @@ public class WebsocketServer {
 				throw new RuntimeException(e);
 			}
 		}
-		return message;
 	}
 
 	@OnClose
@@ -73,7 +60,7 @@ public class WebsocketServer {
 		log.info(String.format("Session %s closed because of %s",
 				session.getId(), closeReason));
 		sessions.remove(session.getId());
-		consumer.remove(session);
+		bus.post(new SessionEvent(TYPE.CLOSE, session));
 	}
 
 }

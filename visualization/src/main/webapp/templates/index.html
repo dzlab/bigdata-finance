@@ -1,7 +1,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
      <style type="text/css">
-        #flot-placeholder{width:350px;height:300px;}        
+        #flot-placeholder{width:350px;height:300px;}
     </style>
     <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="http://www.pureexample.com/js/flot/excanvas.min.js"></script><![endif]-->
     <script type="text/javascript" src="http://www.pureexample.com/js/lib/jquery-1.8.3.min.js"></script>
@@ -25,12 +25,11 @@
         			  console.log('Disconnecting connection');
        			  }
 
-        		  socket.onmessage = function (evt) 
-        		     { 
-        		        var received_msg = evt.data;
-        		        console.log(received_msg);
-        		        console.log('message received!');
-        		        //showMessage(received_msg);
+        		  socket.onmessage = function (evt)
+        		     {
+        		        var data = evt.data;
+        		        console.log('Data received: ' + data);
+        		        display(data);
         		     }
 
         		} else {
@@ -42,11 +41,12 @@
             console.log("Disconnected");
         }
         connect();
-        
-        var data = [[1, 130], [2, 40], [3, 80], [4, 160], [5, 159], [6, 370], [7, 330], [8, 350], [9, 370], [10, 400], [11, 330], [12, 350]];
- 
-        var dataset = [{label: "line1",data: data}];
- 
+
+        //var data = [[1, 130], [2, 40], [3, 80], [4, 160], [5, 159], [6, 370], [7, 330], [8, 350], [9, 370], [10, 400], [11, 330], [12, 350]];
+        var data = [];
+
+        var dataset = [{label: "eurusd",data: data}];
+
         var options = {
             series: {
                 lines: { show: true },
@@ -56,13 +56,39 @@
                 }
             }
         };
- 
-        $(document).ready(function () {
+
+        function display(point) {
+          data.push([data.length+1, parseFloat(point.conversion)]);
+          $(document).ready(function () {
             $.plot($("#flot-placeholder"), dataset, options);
+          });
+        }
+        $(document).ready(function () {
+          $.plot($("#flot-placeholder"), dataset, options);
         });
     </script>
 </head>
 <body>
     <div id="flot-placeholder"></div>
+    <!--<form action="#" th:action="@{/rule}" th:object="${rule}" method="post">
+      <select th:field="*{forex}">
+        <option th:each="currency : ${currencies}"
+        th:value="${currency}"
+        th:text="${currency}">EURUSD</option>
+      </select>
+      <select th:field="*{action}">
+        <option th:each="action : ${actions}"
+        th:value="${action}"
+        th:text="${action}">BUY</option>
+      </select>
+      <select th:field="*{comparison}">
+        <option th:each="comparison : ${comparisons}"
+        th:value="${comparison}"
+        th:text="${comparison}">EQ</option>
+      </select>
+      <input type="text" th:field="*{value}" />
+      <input type="text" th:field="*{expires}" />
+      <input type="submit" value="Submit Rule" name="submit" class="submit" />
+    </form>-->
 </body>
 </html>
